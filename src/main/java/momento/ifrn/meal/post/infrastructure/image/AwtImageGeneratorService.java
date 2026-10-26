@@ -14,20 +14,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-    public class AwtImageGeneratorService implements ImageGeneratorService {
+public class AwtImageGeneratorService implements ImageGeneratorService {
 
     private static final float FONT_SIZE = 47.4f;
     private static final String FONT_PATH = "/fonts/OpenSans-Regular.ttf";
     private static final Color TEXT_COLOR = Color.BLACK;
 
     private static final int BOX_X = 170;
-    private static final int BOX_Y = 706;
     private static final int BOX_WIDTH = 740;
-    private static final int BOX_HEIGHT = 628;
+
+
+    private static final int TEXT_START_Y = 690;
+
     private static final int LINE_SPACING = 10;
+    private static final int ITEM_SPACING = 18;
+    private static final String BULLET = "•  ";
 
     private Font openSansFont;
 
@@ -55,7 +61,7 @@ import java.util.List;
             g.drawImage(template, 0, 0, null);
             g.setFont(openSansFont);
             g.setColor(TEXT_COLOR);
-            drawWrappedText(g, menu.getText());
+            drawItems(g, menu.getText());
         } finally {
             g.dispose();
         }
@@ -86,39 +92,59 @@ import java.util.List;
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
     }
 
-    private void drawWrappedText(final Graphics2D g, final String text) {
+    private List<String> parseItems(final String rawText) {
+        return Arrays.stream(rawText.split("[\\n,]+"))
+                .map(String::trim)
+                .filter(item -> !item.isEmpty())
+                .collect(Collectors.toList());
+    }
+
+    private void drawItems(final Graphics2D g, final String rawText) {
         final FontMetrics metrics = g.getFontMetrics();
-        final List<String> lines = wrapText(text, metrics, BOX_WIDTH);
+        final List<String> items = parseItems(rawText);
 
         final int lineHeight = metrics.getAscent() + metrics.getDescent() + LINE_SPACING;
-        final int totalHeight = lines.size() * lineHeight - LINE_SPACING;
+        final int bulletWidth = metrics.stringWidth(BULLET);
 
-        int y = BOX_Y + Math.max(0, (BOX_HEIGHT - totalHeight) / 2) + metrics.getAscent();
+        int y = TEXT_START_Y + metrics.getAscent();
 
-        for (final String line : lines) {
-            g.drawString(line, BOX_X, y);
-            y += lineHeight;
+        for (final String item : items) {
+            final List<String> wrappedLines = wrapText(item, metrics, BOX_WIDTH - bulletWidth);
+
+            for (int i = 0; i < wrappedLines.size(); i++) {
+                final String line = wrappedLines.get(i);
+
+                if (i == 0) {
+                    g.drawString(BULLET + line, BOX_X, y);
+                } else {
+                    g.drawString(line, BOX_X + bulletWidth, y);
+                }
+
+                y += lineHeight;
+            }
+
+            y += ITEM_SPACING;
         }
     }
 
     private List<String> wrapText(final String text, final FontMetrics metrics, final int maxWidth) {
         final List<String> lines = new ArrayList<>();
+        final StringBuilder currentLine = new StringBuilder();
 
-        for (final String paragraph : text.split("\n", -1)) {
-            final StringBuilder currentLine = new StringBuilder();
+        for (final String word : text.split(" ")) {
+            final String candidate = currentLine.isEmpty() ? word : currentLine + " " + word;
 
-            for (final String word : paragraph.split(" ")) {
-                final String candidate = currentLine.isEmpty() ? word : currentLine + " " + word;
-
-                if (metrics.stringWidth(candidate) > maxWidth && !currentLine.isEmpty()) {
-                    lines.add(currentLine.toString());
-                    currentLine.setLength(0);
-                    currentLine.append(word);
-                } else {
-                    currentLine.setLength(0);
-                    currentLine.append(candidate);
-                }
+            if (metrics.stringWidth(candidate) > maxWidth && !currentLine.isEmpty()) {
+                lines.add(currentLine.toString());
+                currentLine.setLength(0);
+                currentLine.append(word);
+            } else {
+                currentLine.setLength(0);
+                currentLine.append(candidate);
             }
+        }
+
+        if (!currentLine.isEmpty()) {
             lines.add(currentLine.toString());
         }
 
