@@ -1,6 +1,7 @@
 package momento.ifrn.meal.post.web.controller;
 
 import lombok.RequiredArgsConstructor;
+import momento.ifrn.meal.post.domain.DinnerMenu;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,8 +12,7 @@ public class HomeController {
 
     @GetMapping
     public String home(final Model model) {
+        model.addAttribute("dinnerMenu", new DinnerMenu());
         return "index";
     }
-
-
 }
