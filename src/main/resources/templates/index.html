@@ -115,9 +115,9 @@
 </div>
 
 <script th:inline="javascript">
-    
-    const flashMensagem = null;
-    const flashErro = null;
+
+    const flashMensagem = /*[[${mensagem}]]*/ null;
+    const flashErro = /*[[${erro}]]*/ null;
 
     const inputs = document.querySelectorAll('.seg-input');
     const root = document.documentElement;
