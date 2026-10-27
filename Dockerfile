@@ -1,7 +1,7 @@
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-COPY target/momento-ifrn-0.0.1-SNAPSHOT.jar app.jar
+COPY target/*.jar app.jar
 
 ENV SPRING_PROFILES_ACTIVE=prod
 
