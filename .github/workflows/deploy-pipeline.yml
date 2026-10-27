@@ -1,0 +1,48 @@
+name: Deploy Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  IMAGE: docker.io/samuelfranklindev/momentoifrn
+  TAG: sha-${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build Project
+        run: mvn -B -DskipTests clean package
+
+      - name: Login Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker Image
+        run: |
+          docker build --platform=linux/amd64 \
+            -t $IMAGE:$TAG \
+            -t $IMAGE:latest \
+            .
+
+      - name: Push Docker Image
+        run: |
+          docker push $IMAGE:$TAG
+          docker push $IMAGE:latest
+
+      - name: Trigger Render Deploy
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          curl -fsS -X POST "$RENDER_DEPLOY_HOOK&imgURL=docker.io%2Fsamuelfranklindev%2Fmomentoifrn%3A${TAG}"
