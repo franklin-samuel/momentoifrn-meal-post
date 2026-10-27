@@ -26,6 +26,7 @@ public class MealService {
 
         final StoryPost post = StoryPost.builder()
                 .imageUrl(publicUrl)
+                .mediaType("STORIES")
                 .build();
 
         instagramPublisherService.publish(post);

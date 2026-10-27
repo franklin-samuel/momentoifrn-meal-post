@@ -11,5 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StoryPost {
     private String imageUrl;
+
+    @Builder.Default
     private String mediaType = "STORIES";
 }
