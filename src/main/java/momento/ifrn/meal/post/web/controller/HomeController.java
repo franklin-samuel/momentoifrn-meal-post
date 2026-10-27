@@ -15,7 +15,7 @@ public class HomeController {
         return new DinnerMenu();
     }
 
-    @GetMapping
+    @GetMapping("/")
     public String home() {
         return "index";
     }
