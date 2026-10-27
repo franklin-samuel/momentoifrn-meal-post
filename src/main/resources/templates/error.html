@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momento IFRN — Algo deu errado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --accent: #FF7C15;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        .accent-bg { background-color: var(--accent); }
+        .accent-text { color: var(--accent); }
+        .accent-ring:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+    </style>
+</head>
+<body class="min-h-screen bg-neutral-100 flex items-center justify-center p-4">
+
+<div class="w-full max-w-md"
+     th:with="code=${status != null ? status : 500}">
+
+    <div class="text-center mb-6">
+        <h1 class="text-2xl font-extrabold text-neutral-900">Momento IFRN</h1>
+        <p class="text-neutral-500 text-sm mt-1">Publique o cardápio direto nos Stories</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg p-6 text-center" role="alert">
+
+        <p class="accent-text text-6xl font-extrabold leading-none" th:text="${code}">500</p>
+
+        <h2 class="text-lg font-bold text-neutral-900 mt-4"
+            th:text="${code == 404 ? 'Página não encontrada'
+                    : code == 403 ? 'Acesso negado'
+                    : code == 400 ? 'Requisição inválida'
+                    : code == 405 ? 'Ação não permitida'
+                    : 'Algo deu errado no servidor'}">
+            Algo deu errado no servidor
+        </h2>
+
+        <p class="text-neutral-500 text-sm mt-2"
+           th:text="${code == 404 ? 'O endereço que você abriu não existe. Volte ao início e tente de novo.'
+                   : code == 403 ? 'Você não tem permissão para abrir esta página.'
+                   : code == 400 ? 'Os dados enviados não puderam ser processados. Volte e confira o formulário.'
+                   : code == 405 ? 'Essa ação não funciona por este endereço. Volte ao início e use o formulário.'
+                   : 'Não foi possível concluir a operação. Tente de novo em instantes; se continuar, avise quem mantém o sistema.'}">
+            Não foi possível concluir a operação. Tente de novo em instantes; se continuar, avise quem mantém o sistema.
+        </p>
+
+        <a th:href="@{/}"
+           class="accent-bg accent-ring block w-full mt-6 text-white font-bold py-3 rounded-xl transition-colors hover:opacity-90 active:scale-[0.99]">
+            Voltar ao início
+        </a>
+
+        <p class="text-neutral-400 text-xs mt-4" th:if="${path != null}">
+            Endereço: <span class="font-mono" th:text="${path}">/exemplo</span>
+        </p>
+    </div>
+
+    <p class="text-center text-neutral-400 text-xs mt-5">@momentoifrn</p>
+</div>
+
+</body>
+</html>
