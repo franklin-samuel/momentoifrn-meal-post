@@ -115,12 +115,10 @@
 </div>
 
 <script th:inline="javascript">
-    const flashMensagem =  null;
+    
+    const flashMensagem = null;
     const flashErro = null;
-    /*]]>*/
-</script>
 
-<script>
     const inputs = document.querySelectorAll('.seg-input');
     const root = document.documentElement;
 
@@ -149,6 +147,18 @@
     const checkedInput = document.querySelector('.seg-input:checked');
     if (checkedInput) applySelection(checkedInput);
 
+    const form = document.querySelector('form');
+    const submitBtn = document.getElementById('submit-btn');
+    const submitSpinner = document.getElementById('submit-spinner');
+    const submitText = document.getElementById('submit-text');
+
+    form.addEventListener('submit', () => {
+        submitBtn.disabled = true;
+        submitSpinner.classList.remove('hidden');
+        submitText.textContent = 'Publicando...';
+    });
+
+
     function showToast(message, type) {
         const container = document.getElementById('toast-container');
 
@@ -169,18 +179,6 @@
 
     if (flashMensagem) showToast(flashMensagem, 'success');
     if (flashErro) showToast(flashErro, 'error');
-</script>
-<script>
-    const form = document.querySelector('form');
-    const submitBtn = document.getElementById('submit-btn');
-    const submitSpinner = document.getElementById('submit-spinner');
-    const submitText = document.getElementById('submit-text');
-
-    form.addEventListener('submit', () => {
-        submitBtn.disabled = true;
-        submitSpinner.classList.remove('hidden');
-        submitText.textContent = 'Publicando...';
-    });
 </script>
 
 </body>
