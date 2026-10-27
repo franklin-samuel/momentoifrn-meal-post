@@ -12,5 +12,5 @@ import momento.ifrn.meal.post.domain.enums.MealType;
 @AllArgsConstructor
 public class DinnerMenu {
     private String text;
-    private MealType mealType = MealType.SNACK;
+    private MealType mealType = MealType.LUNCH;
 }
