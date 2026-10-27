@@ -6,11 +6,11 @@ import momento.ifrn.meal.post.business.MealService;
 import momento.ifrn.meal.post.core.Context;
 import momento.ifrn.meal.post.domain.DinnerMenu;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @Controller
@@ -21,31 +21,30 @@ public class StoryController {
     private final MealService mealService;
 
     @PostMapping
-    public String post(@ModelAttribute final DinnerMenu dinnerMenu, final Model model) {
+    public String post(@ModelAttribute final DinnerMenu dinnerMenu, final RedirectAttributes redirectAttributes) {
 
         if (!StringUtils.hasText(dinnerMenu.getText())) {
-            model.addAttribute("erro", "Digite o texto do cardápio antes de publicar.");
-            model.addAttribute("dinnerMenu", dinnerMenu);
-            return "index";
+            redirectAttributes.addFlashAttribute("erro", "Digite o texto do cardápio antes de publicar.");
+            redirectAttributes.addFlashAttribute("dinnerMenu", dinnerMenu);
+            return "redirect:/";
         }
 
         if (dinnerMenu.getMealType() == null) {
-            model.addAttribute("erro", "Selecione o tipo de refeição.");
-            model.addAttribute("dinnerMenu", dinnerMenu);
-            return "index";
+            redirectAttributes.addFlashAttribute("erro", "Selecione o tipo de refeição.");
+            redirectAttributes.addFlashAttribute("dinnerMenu", dinnerMenu);
+            return "redirect:/";
         }
 
         try {
             final Context context = new Context(dinnerMenu);
             mealService.execute(context);
-            model.addAttribute("mensagem", "Postado com sucesso no Instagram!");
-            model.addAttribute("dinnerMenu", new DinnerMenu());
+            redirectAttributes.addFlashAttribute("mensagem", "Postado com sucesso no Instagram!");
         } catch (final Exception e) {
             log.error("Erro ao postar cardápio no Instagram", e);
-            model.addAttribute("erro", "Erro ao postar: " + e.getMessage());
-            model.addAttribute("dinnerMenu", dinnerMenu);
+            redirectAttributes.addFlashAttribute("erro", "Erro ao postar: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("dinnerMenu", dinnerMenu);
         }
 
-        return "index";
+        return "redirect:/";
     }
 }

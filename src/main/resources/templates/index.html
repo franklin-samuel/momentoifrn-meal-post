@@ -13,11 +13,48 @@
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
         .accent-bg { background-color: var(--accent); }
-        .accent-text { color: var(--accent); }
         .accent-ring:focus { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+
+        #toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: min(90vw, 360px);
+        }
+
+        .toast {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            padding: 0.9rem 1rem;
+            border-radius: 0.8rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: white;
+            opacity: 0;
+            transform: translateX(16px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast.hide {
+            opacity: 0;
+            transform: translateX(16px);
+        }
+        .toast-success { background-color: #16a34a; }
+        .toast-error { background-color: #dc2626; }
     </style>
 </head>
 <body class="min-h-screen bg-neutral-100 flex items-center justify-center p-4">
+
+<div id="toast-container"></div>
 
 <div class="w-full max-w-md">
 
@@ -27,9 +64,6 @@
     </div>
 
     <div class="bg-white rounded-2xl shadow-lg p-6">
-
-        <div th:if="${mensagem}" class="mb-4 rounded-lg bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3" th:text="${mensagem}"></div>
-        <div th:if="${erro}" class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3" th:text="${erro}"></div>
 
         <form th:action="@{/story}" th:object="${dinnerMenu}" method="post">
 
@@ -58,16 +92,20 @@
                     id="text"
                     th:field="*{text}"
                     rows="6"
-                    placeholder="Ex: Arroz, feijão, frango grelhado, salada e suco de laranja"
+                    placeholder="Ex: Arroz, Feijão, Frango, Carne Cozida"
                     class="w-full resize-none rounded-xl border border-neutral-200 px-4 py-3 text-neutral-800 text-sm accent-ring focus:border-transparent"
             ></textarea>
 
             <button
                     type="submit"
                     id="submit-btn"
-                    class="accent-bg w-full mt-5 text-white font-bold py-3 rounded-xl transition-colors hover:opacity-90 active:scale-[0.99]"
+                    class="accent-bg w-full mt-5 text-white font-bold py-3 rounded-xl transition-colors hover:opacity-90 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-                Publicar no Instagram
+                <svg id="submit-spinner" class="hidden animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <span id="submit-text">Publicar no Instagram</span>
             </button>
 
         </form>
@@ -76,10 +114,15 @@
     <p class="text-center text-neutral-400 text-xs mt-5">@momentoifrn</p>
 </div>
 
+<script th:inline="javascript">
+    const flashMensagem =  null;
+    const flashErro = null;
+    /*]]>*/
+</script>
+
 <script>
     const inputs = document.querySelectorAll('.seg-input');
     const root = document.documentElement;
-    const submitBtn = document.getElementById('submit-btn');
 
     function applySelection(input) {
         const color = input.dataset.color;
@@ -101,11 +144,43 @@
 
     inputs.forEach(input => {
         input.addEventListener('change', () => applySelection(input));
-        if (input.checked) applySelection(input);
     });
 
     const checkedInput = document.querySelector('.seg-input:checked');
     if (checkedInput) applySelection(checkedInput);
+
+    function showToast(message, type) {
+        const container = document.getElementById('toast-container');
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerText = message;
+
+        container.appendChild(toast);
+
+        requestAnimationFrame(() => toast.classList.add('show'));
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.classList.add('hide');
+            toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+        }, 4000);
+    }
+
+    if (flashMensagem) showToast(flashMensagem, 'success');
+    if (flashErro) showToast(flashErro, 'error');
+</script>
+<script>
+    const form = document.querySelector('form');
+    const submitBtn = document.getElementById('submit-btn');
+    const submitSpinner = document.getElementById('submit-spinner');
+    const submitText = document.getElementById('submit-text');
+
+    form.addEventListener('submit', () => {
+        submitBtn.disabled = true;
+        submitSpinner.classList.remove('hidden');
+        submitText.textContent = 'Publicando...';
+    });
 </script>
 
 </body>

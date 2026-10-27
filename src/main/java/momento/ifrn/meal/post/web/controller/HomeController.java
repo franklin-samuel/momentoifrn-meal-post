@@ -12,7 +12,9 @@ public class HomeController {
 
     @GetMapping
     public String home(final Model model) {
-        model.addAttribute("dinnerMenu", new DinnerMenu());
+        if (model.getAttribute("dinnerMenu") == null) {
+            model.addAttribute("dinnerMenu", new DinnerMenu());
+        }
         return "index";
     }
 }
