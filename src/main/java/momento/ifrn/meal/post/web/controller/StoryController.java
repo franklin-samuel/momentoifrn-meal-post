@@ -30,7 +30,7 @@ public class StoryController {
         }
 
         if (dinnerMenu.getMealType() == null) {
-            redirectAttributes.addFlashAttribute("erro", "Selecione o tipo de refeição.");
+            redirectAttributes.addFlashAttribute("erro", "Selecione o tipo de refeição");
             redirectAttributes.addFlashAttribute("dinnerMenu", dinnerMenu);
             return "redirect:/";
         }
