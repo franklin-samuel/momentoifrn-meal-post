@@ -28,6 +28,7 @@ public class GraphApiInstagramPublisherService implements InstagramPublisherServ
 
     private final RestClient instagramRestClient;
     private final InstagramProperties instagramProperties;
+    private final InstagramTokenManager tokenManager;
 
     @Override
     public void publish(final StoryPost post) {
@@ -42,7 +43,7 @@ public class GraphApiInstagramPublisherService implements InstagramPublisherServ
                         .path("/{igUserId}/media")
                         .queryParam("image_url", post.getImageUrl())
                         .queryParam("media_type", post.getMediaType())
-                        .queryParam("access_token", instagramProperties.getAccessToken())
+                        .queryParam("access_token", tokenManager.getAccessToken())
                         .build(instagramProperties.getUserId()))
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, this::handleError)
@@ -80,7 +81,7 @@ public class GraphApiInstagramPublisherService implements InstagramPublisherServ
                 .uri(uriBuilder -> uriBuilder
                         .path("/{creationId}")
                         .queryParam("fields", "status_code")
-                        .queryParam("access_token", instagramProperties.getAccessToken())
+                        .queryParam("access_token", tokenManager.getAccessToken())
                         .build(creationId))
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, this::handleError)
@@ -94,7 +95,7 @@ public class GraphApiInstagramPublisherService implements InstagramPublisherServ
                 .uri(uriBuilder -> uriBuilder
                         .path("/{igUserId}/media_publish")
                         .queryParam("creation_id", creationId)
-                        .queryParam("access_token", instagramProperties.getAccessToken())
+                        .queryParam("access_token", tokenManager.getAccessToken())
                         .build(instagramProperties.getUserId()))
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, this::handleError)

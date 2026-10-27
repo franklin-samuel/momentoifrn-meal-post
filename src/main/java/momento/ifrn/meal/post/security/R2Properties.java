@@ -13,10 +13,12 @@ public class R2Properties {
     private String secretKey;
     private String bucketName;
     private String publicBaseUrl;
+    private String tokenBucketName;
 
     public void setEndpoint(String endpoint) { this.endpoint = endpoint; }
     public void setAccessKey(String accessKey) { this.accessKey = accessKey; }
     public void setSecretKey(String secretKey) { this.secretKey = secretKey; }
     public void setBucketName(String bucketName) { this.bucketName = bucketName; }
     public void setPublicBaseUrl(String publicBaseUrl) { this.publicBaseUrl = publicBaseUrl; }
+    public void setTokenBucketName(String tokenBucketName) { this.tokenBucketName = tokenBucketName; }
 }
