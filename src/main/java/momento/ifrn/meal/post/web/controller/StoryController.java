@@ -24,7 +24,7 @@ public class StoryController {
     public String post(@ModelAttribute final DinnerMenu dinnerMenu, final RedirectAttributes redirectAttributes) {
 
         if (!StringUtils.hasText(dinnerMenu.getText())) {
-            redirectAttributes.addFlashAttribute("erro", "Digite o texto do cardápio antes de publicar.");
+            redirectAttributes.addFlashAttribute("erro", "Digite o texto do cardápio antes de publicar");
             redirectAttributes.addFlashAttribute("dinnerMenu", dinnerMenu);
             return "redirect:/";
         }
